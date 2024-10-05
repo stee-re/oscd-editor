@@ -14,12 +14,16 @@
     "type": "git",
     "url": "https://github.com/OpenEnergyTools/xml-lib.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch --coverage",
-    "build": "npx rimraf dist && tsc"
+    "build": "npx rimraf dist && tsc",
+    "semantic-release": "semantic-release"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.1",
@@ -32,6 +36,7 @@
     "eslint": "^8.40.0",
     "fast-check": "^3.1.1",
     "prettier": "^3.1.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "semantic-release": "24.1.2"
   }
 }
