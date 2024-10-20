@@ -17,7 +17,7 @@ jobs:
         run: npm ci
 
       - name: Install optional dependencies
-        run: npm install @rollup/rollup-linux-arm64-gnu
+        run: npm install @rollup/rollup-linux-x64-gnu
 
       - name: Run tests
         run: npm run-script test
