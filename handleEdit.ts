@@ -173,5 +173,7 @@ export function handleEdit(edit: EditV2): EditV2 {
   if (isSetTextContent(edit)) return handleSetTextContent(edit);
   if (isComplex(edit)) return edit.map((edit) => handleEdit(edit)).reverse();
 
+  console.error(`Invalid edit provided: ${edit}`);
+
   return [];
 }
