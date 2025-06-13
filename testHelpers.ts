@@ -20,7 +20,7 @@ import {
   Remove,
   SetAttributes,
   SetTextContent,
-} from "./editv2.js";
+} from "@omicronenergy/oscd-api";
 
 export const xmlAttributeName = /^[A-Za-z_][A-Za-z0-9-_.]*$/;
 export const xmlNamespacePrefix = /^[A-Za-z_][A-Za-z0-9-_.]*$/;

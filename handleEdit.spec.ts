@@ -14,7 +14,7 @@ import {
   xmlAttributeName,
 } from "./testHelpers.js";
 
-import { EditV2, Insert } from "./editv2.js";
+import { EditV2, Insert } from "@omicronenergy/oscd-api";
 import { handleEdit } from "./handleEdit.js";
 
 import { assert, property } from "fast-check";

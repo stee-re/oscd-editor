@@ -10,13 +10,11 @@ export {
   isRemove,
   isSetAttributes,
   isSetTextContent,
-} from "./editv2.js";
+} from "@omicronenergy/oscd-api";
 
-export { Edit, Update, isEdit } from "./editv1.js";
+export { Edit, Update, isEdit } from "@omicronenergy/oscd-api";
 
 export { handleEdit } from "./handleEdit.js";
-
-export { convertEdit } from "./convertEdit.js";
 
 export {
   complexEdit,
@@ -34,6 +32,4 @@ export type {
   CommitOptions,
   Transactor,
   TransactedCallback,
-} from "./Transactor.js";
-
-export { newEditEventV2 } from "./edit-event.js";
+} from "@omicronenergy/oscd-api";

@@ -1,12 +1,11 @@
-import { EditV2 } from "./editv2.js";
-
 import { handleEdit } from "./handleEdit.js";
 import {
   Commit,
-  TransactedCallback,
   CommitOptions,
+  EditV2,
+  TransactedCallback,
   Transactor,
-} from "./Transactor.js";
+} from "@omicronenergy/oscd-api";
 
 export class XMLEditor implements Transactor<EditV2> {
   past: Commit<EditV2>[] = [];

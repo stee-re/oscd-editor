@@ -9,7 +9,7 @@ import {
   Remove,
   SetAttributes,
   SetTextContent,
-} from "./editv2.js";
+} from "@omicronenergy/oscd-api";
 
 function handleSetTextContent({
   element,

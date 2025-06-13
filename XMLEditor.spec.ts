@@ -10,10 +10,15 @@ import {
   undoRedoTestCases,
 } from "./testHelpers.js";
 
-import { EditV2, isSetAttributes, isSetTextContent } from "./editv2.js";
+import {
+  Commit,
+  EditV2,
+  isSetAttributes,
+  isSetTextContent,
+  Transactor,
+} from "@omicronenergy/oscd-api";
 
 import { XMLEditor } from "./XMLEditor.js";
-import { Commit, Transactor } from "./Transactor.js";
 
 describe("XMLEditor", () => {
   let editor: Transactor<EditV2>;
