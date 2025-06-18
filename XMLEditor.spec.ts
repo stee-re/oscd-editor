@@ -4,19 +4,19 @@ import { expect } from "@open-wc/testing";
 import { assert, property } from "fast-check";
 
 import {
-  sclDocString,
   testDocs,
   UndoRedoTestCase,
   undoRedoTestCases,
-} from "./testHelpers.js";
+} from "@omicronenergy/oscd-test-utils/arbitraries.js";
+
+import { sclDocString } from "@omicronenergy/oscd-test-utils/scl-sample-docs.js";
+
+import { Commit, EditV2, Transactor } from "@omicronenergy/oscd-api";
 
 import {
-  Commit,
-  EditV2,
-  isSetAttributes,
   isSetTextContent,
-  Transactor,
-} from "@omicronenergy/oscd-api";
+  isSetAttributes,
+} from "@omicronenergy/oscd-api/utils.js";
 
 import { XMLEditor } from "./XMLEditor.js";
 

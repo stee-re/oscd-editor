@@ -1,15 +1,18 @@
 import {
   EditV2,
   Insert,
-  isComplex,
-  isInsert,
-  isRemove,
-  isSetAttributes,
-  isSetTextContent,
   Remove,
   SetAttributes,
   SetTextContent,
 } from "@omicronenergy/oscd-api";
+
+import {
+  isComplexEditV2,
+  isInsert,
+  isRemove,
+  isSetAttributes,
+  isSetTextContent,
+} from "@omicronenergy/oscd-api/utils.js";
 
 function handleSetTextContent({
   element,
@@ -32,65 +35,66 @@ function handleSetTextContent({
 
 function handleSetAttributes({
   element,
-  attributes,
-  attributesNS,
+  attributes = {},
+  attributesNS = {},
 }: SetAttributes): SetAttributes {
   const oldAttributes = { ...attributes };
   const oldAttributesNS = { ...attributesNS };
 
   // save element's non-prefixed attributes for undo
-  Object.keys(attributes)
-    .reverse()
-    .forEach((name) => {
-      oldAttributes[name] = element.getAttribute(name);
-    });
-
-  // change element's non-prefixed attributes
-  for (const entry of Object.entries(attributes)) {
-    try {
-      const [name, value] = entry as [string, string | null];
-      if (value === null) element.removeAttribute(name);
-      else element.setAttribute(name, value);
-    } catch (_e) {
-      // undo nothing if update didn't work on this attribute
-      delete oldAttributes[entry[0]];
-    }
-  }
-
-  // save element's namespaced attributes for undo
-  Object.entries(attributesNS).forEach(([ns, attrs]) => {
-    Object.keys(attrs!)
+  if (attributes)
+    Object.keys(attributes)
       .reverse()
       .forEach((name) => {
-        oldAttributesNS[ns] = {
-          ...oldAttributesNS[ns],
-          [name]: element.getAttributeNS(ns, name.split(":").pop()!),
-        };
+        oldAttributes[name] = element.getAttribute(name);
       });
-    Object.keys(attrs!).forEach((name) => {
-      delete oldAttributesNS[ns]![name];
-    });
-  });
 
-  // change element's namespaced attributes
-  for (const nsEntry of Object.entries(attributesNS)) {
-    const [ns, attrs] = nsEntry as [
-      string,
-      Partial<Record<string, string | null>>,
-    ];
-    for (const entry of Object.entries(attrs)) {
+  // change element's non-prefixed attributes
+  if (attributes)
+    for (const entry of Object.entries(attributes)) {
       try {
         const [name, value] = entry as [string, string | null];
-        if (value === null) {
-          element.removeAttributeNS(ns, name.split(":").pop()!);
-        } else {
-          element.setAttributeNS(ns, name, value);
-        }
+        if (value === null) element.removeAttribute(name);
+        else element.setAttribute(name, value);
       } catch (_e) {
-        delete oldAttributesNS[ns]![entry[0]];
+        // undo nothing if update didn't work on this attribute
+        delete oldAttributes[entry[0]];
       }
     }
-  }
+
+  // save element's namespaced attributes for undo
+  if (attributesNS)
+    Object.entries(attributesNS).forEach(([ns, attrs]) => {
+      Object.keys(attrs!)
+        .reverse()
+        .forEach((name) => {
+          oldAttributesNS[ns] = {
+            ...oldAttributesNS[ns],
+            [name]: element.getAttributeNS(ns, name.split(":").pop()!),
+          };
+        });
+    });
+
+  // change element's namespaced attributes
+  if (attributesNS)
+    for (const nsEntry of Object.entries(attributesNS)) {
+      const [ns, attrs] = nsEntry as [
+        string,
+        Partial<Record<string, string | null>>,
+      ];
+      for (const entry of Object.entries(attrs)) {
+        try {
+          const [name, value] = entry as [string, string | null];
+          if (value === null) {
+            element.removeAttributeNS(ns, name.split(":").pop()!);
+          } else {
+            element.setAttributeNS(ns, name, value);
+          }
+        } catch (_e) {
+          delete oldAttributesNS[ns]![entry[0]];
+        }
+      }
+    }
 
   return {
     element,
@@ -141,13 +145,11 @@ export function handleEdit(edit: EditV2): EditV2 {
   if (isRemove(edit)) return handleRemove(edit);
   if (isSetAttributes(edit)) return handleSetAttributes(edit);
   if (isSetTextContent(edit)) return handleSetTextContent(edit);
-  if (isComplex(edit))
+  if (isComplexEditV2(edit))
     return edit
       .map((edit) => handleEdit(edit))
       .reverse()
       .flat(Infinity as 1);
-
-  console.error(`Invalid edit provided: ${edit}`);
 
   return [];
 }
