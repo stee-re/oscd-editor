@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2018",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmitOnError": true,
     "lib": ["es2022", "dom"],
     "strict": true,
@@ -15,6 +15,7 @@
     "inlineSources": true,
     "rootDir": "./",
     "declaration": true,
+    "skipLibCheck": true,
   },
-  "include": ["**/*.ts"]
+  "include": ["./*.ts"]
 }

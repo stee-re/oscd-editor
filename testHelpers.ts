@@ -22,6 +22,8 @@ import {
   SetTextContent,
 } from "@omicronenergy/oscd-api";
 
+import { isInsert } from "@omicronenergy/oscd-api/utils.js";
+
 export const xmlAttributeName = /^[A-Za-z_][A-Za-z0-9-_.]*$/;
 export const xmlNamespacePrefix = /^[A-Za-z_][A-Za-z0-9-_.]*$/;
 export function xmlPrefixedAttributeName(prefix: string) {
@@ -104,22 +106,20 @@ export function setAttributes(nodes: Node[]): Arbitrary<SetAttributes> {
     stringMatching(xmlAttributeName),
     oneof(stringArbitrary(), constant(null)),
   );
-  const namespaces = array(tuple(webUrl(), stringMatching(xmlNamespacePrefix)));
-  const prefixedAttributes = namespaces.chain((urlPrefixTuples) => {
-    const shape: Record<string, Arbitrary<unknown>> = {};
-    urlPrefixTuples.forEach(([url, prefix]) => {
-      shape[url] = dictionary(
-        stringMatching(xmlPrefixedAttributeName(prefix)),
-        oneof(stringArbitrary(), constant(null)),
-      );
-    });
-    return record(shape);
-  });
   // object() instead of nested dictionary() necessary for performance reasons
-  const attributesNS = objectArbitrary({
-    key: webUrl(),
-    values: [prefixedAttributes],
-    maxDepth: 0,
+  const attributesNS = array(webUrl()).chain((urls) => {
+    let prefixIndex = 0;
+    return record(
+      Object.fromEntries(
+        urls.map((url) => [
+          url,
+          dictionary(
+            stringMatching(xmlPrefixedAttributeName(`ens${prefixIndex++}`)),
+            oneof(stringArbitrary(), constant(null)),
+          ),
+        ]),
+      ),
+    );
   }) as Arbitrary<Record<string, Record<string, string | null>>>;
   return record({ element, attributes, attributesNS });
 }
@@ -181,6 +181,7 @@ export function isParentOf(parent: Node, node: Node | null) {
 
 export function isValidInsert({ parent, node, reference }: Insert) {
   return (
+    isInsert({ parent, node, reference }) &&
     node !== reference &&
     isParentOf(parent, reference) &&
     !node.contains(parent) &&

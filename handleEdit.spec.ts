@@ -15,9 +15,16 @@ import {
 } from "./testHelpers.js";
 
 import { EditV2, Insert } from "@omicronenergy/oscd-api";
+import { isEditV2 } from "@omicronenergy/oscd-api/utils.js";
+
 import { handleEdit } from "./handleEdit.js";
 
 import { assert, property } from "fast-check";
+
+it("fails at distinguishing EditV2", () => {
+  expect(isEditV2([{ node: "notanode", parent: "notanode", reference: 42 }])).to
+    .be.false;
+});
 
 describe("handleEdit", () => {
   let sclDoc: XMLDocument;
@@ -190,29 +197,37 @@ describe("handleEdit", () => {
           testDocs.chain(([{ nodes }]) => setAttributes(nodes)),
           (edit) => {
             handleEdit(edit);
-            const attributesHandledCorrectly = Object.entries(edit.attributes)
-              .filter(([name]) => xmlAttributeName.test(name))
-              .map((entry) => entry as [string, string | null])
-              .every(
-                ([name, value]) => edit.element.getAttribute(name) === value,
-              );
-            const attributesNSHandledCorrectly = Object.entries(
-              edit.attributesNS,
-            )
-              .map((entry) => entry as [string, Record<string, string | null>])
-              .every(([ns, attributes]) => {
-                const unprefixedAttributes = Object.fromEntries(
-                  Object.entries(attributes)
-                    .filter(([name]) => xmlAttributeName.test(name))
-                    .map((entry) => entry as [string, string | null])
-                    .map(([name, value]) => [name.split(":", 2).pop(), value])
-                    .filter(([name]) => name),
-                );
-                return Object.entries(unprefixedAttributes).every(
-                  ([name, value]) =>
-                    edit.element.getAttributeNS(ns, name!) === value,
-                );
-              });
+            const attributesHandledCorrectly = edit.attributes
+              ? Object.entries(edit.attributes)
+                  .filter(([name]) => xmlAttributeName.test(name))
+                  .map((entry) => entry as [string, string | null])
+                  .every(
+                    ([name, value]) =>
+                      edit.element.getAttribute(name) === value,
+                  )
+              : true;
+            const attributesNSHandledCorrectly = edit.attributesNS
+              ? Object.entries(edit.attributesNS)
+                  .map(
+                    (entry) => entry as [string, Record<string, string | null>],
+                  )
+                  .every(([ns, attributes]) => {
+                    const unprefixedAttributes = Object.fromEntries(
+                      Object.entries(attributes)
+                        .filter(([name]) => xmlAttributeName.test(name))
+                        .map((entry) => entry as [string, string | null])
+                        .map(([name, value]) => [
+                          name.split(":", 2).pop(),
+                          value,
+                        ])
+                        .filter(([name]) => name),
+                    );
+                    return Object.entries(unprefixedAttributes).every(
+                      ([name, value]) =>
+                        edit.element.getAttributeNS(ns, name!) === value,
+                    );
+                  })
+              : true;
             return attributesHandledCorrectly && attributesNSHandledCorrectly;
           },
         ),
@@ -242,7 +257,7 @@ describe("handleEdit", () => {
               const ed = handleEdit(a);
               undoEdits.unshift(ed);
             });
-            if (edits.length) handleEdit(undoEdits);
+            handleEdit(undoEdits);
             expect(doc1).to.satisfy((doc: XMLDocument) =>
               doc.isEqualNode(oldDoc1),
             );
@@ -252,6 +267,10 @@ describe("handleEdit", () => {
             return true;
           },
         ),
+        {
+          seed: 1017362841,
+          path: "1",
+        },
       )).timeout(20000);
 
     it("changes the document the same way when redoing undone edits", () =>

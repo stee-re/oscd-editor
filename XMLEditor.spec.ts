@@ -10,13 +10,12 @@ import {
   undoRedoTestCases,
 } from "./testHelpers.js";
 
+import { Commit, EditV2, Transactor } from "@omicronenergy/oscd-api";
+
 import {
-  Commit,
-  EditV2,
-  isSetAttributes,
   isSetTextContent,
-  Transactor,
-} from "@omicronenergy/oscd-api";
+  isSetAttributes,
+} from "@omicronenergy/oscd-api/utils.js";
 
 import { XMLEditor } from "./XMLEditor.js";
 
