@@ -18,14 +18,17 @@
     "access": "public"
   },
   "scripts": {
-    "lint": "eslint . && prettier \"**/*.ts\" --check --ignore-path .gitignore",
-    "format": "eslint . --fix && prettier \"**/*.ts\" --write --ignore-path .gitignore",
+    "lint": "eslint .",
+    "format": "eslint . --fix",
     "semantic-release": "semantic-release",
     "test": "npm run build && wtr --coverage",
     "test:watch": "npm run build && concurrently -k -r \"tsc -b --watch --preserveWatchOutput\" \"wtr --watch --coverage\"",
-    "build": "npx rimraf dist && tsc"
+    "build": "npx rimraf dist && tsc",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@open-wc/testing": "3.2.2",
     "@types/mocha": "^10.0.8",
     "@typescript-eslint/eslint-plugin": "^8.8.0",
@@ -33,13 +36,29 @@
     "@web/test-runner": "0.19.0",
     "concurrently": "^9.0.1",
     "eslint": "^9.11.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.4.1",
+    "eslint-plugin-tsdoc": "^0.4.0",
     "fast-check": "^3.22.0",
-    "prettier": "^3.3.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.0",
+    "prettier": "^3.5.3",
     "rimraf": "^3.0.2",
     "semantic-release": "24.1.2",
     "typescript": "^5.6.2"
   },
   "dependencies": {
     "@omicronenergy/oscd-api": "^0.0.11"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "arrowParens": "avoid"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write",
+      "eslint"
+    ]
   }
 }
