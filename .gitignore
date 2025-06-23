@@ -5,3 +5,7 @@ dist
 coverage
 
 .tsbuildinfo
+
+# IDE's 
+.vscode
+.idea
