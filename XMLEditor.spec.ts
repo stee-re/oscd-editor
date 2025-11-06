@@ -233,16 +233,6 @@ describe('XMLEditor', () => {
     expect(called).to.equal(1);
     expect(editor.past).to.have.lengthOf(1);
 
-    editor.undo();
-    expect(called).to.equal(1);
-    expect(editor.past).to.have.lengthOf(0);
-    expect(editor.future).to.have.lengthOf(1);
-
-    editor.redo();
-    expect(called).to.equal(1);
-    expect(editor.past).to.have.lengthOf(1);
-    expect(editor.future).to.have.lengthOf(0);
-
     const unsubscribed = unsubscribe();
     expect(unsubscribed).to.equal(callback);
 
@@ -250,6 +240,52 @@ describe('XMLEditor', () => {
     expect(committed).to.have.property('title', 'test');
     expect(called).to.equal(1);
     expect(editor.past).to.have.lengthOf(2);
+  });
+
+  it('notifies subscribers on undo with the previous commit', () => {
+    const node = sclDoc.querySelector('Substation')!;
+    const edit = { node };
+
+    const subscriber = sinon.spy();
+
+    editor.subscribe(subscriber);
+
+    const firstCommit = editor.commit(edit, { title: 'first' });
+    sinon.assert.calledOnce(subscriber);
+    sinon.assert.calledWithExactly(subscriber, firstCommit);
+
+    const secondCommit = editor.commit(edit, { title: 'second' });
+    sinon.assert.calledTwice(subscriber);
+    sinon.assert.calledWithExactly(subscriber, secondCommit);
+
+    editor.undo();
+    sinon.assert.calledThrice(subscriber);
+    sinon.assert.calledWithExactly(subscriber, firstCommit);
+  });
+
+  it('notifies subscribers on redo with the redone commit', () => {
+    const node = sclDoc.querySelector('Substation')!;
+    const edit = { node };
+
+    const subscriber = sinon.spy();
+
+    editor.subscribe(subscriber);
+
+    const firstCommit = editor.commit(edit, { title: 'first' });
+    sinon.assert.calledOnce(subscriber);
+    sinon.assert.calledWithExactly(subscriber, firstCommit);
+
+    const secondCommit = editor.commit(edit, { title: 'second' });
+    sinon.assert.calledTwice(subscriber);
+    sinon.assert.calledWithExactly(subscriber, secondCommit);
+
+    editor.undo();
+    sinon.assert.calledThrice(subscriber);
+    sinon.assert.calledWithExactly(subscriber, firstCommit);
+
+    editor.redo();
+    sinon.assert.callCount(subscriber, 4);
+    sinon.assert.calledWithExactly(subscriber, secondCommit);
   });
 
   it('unsubscribes the correct subscriber among many', () => {
