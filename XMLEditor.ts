@@ -1,11 +1,11 @@
-import { handleEdit } from "./handleEdit.js";
+import { handleEdit } from './handleEdit.js';
 import {
   Commit,
   CommitOptions,
   EditV2,
   TransactedCallback,
   Transactor,
-} from "@omicronenergy/oscd-api";
+} from '@omicronenergy/oscd-api';
 
 export class XMLEditor implements Transactor<EditV2> {
   past: Commit<EditV2>[] = [];
@@ -27,7 +27,7 @@ export class XMLEditor implements Transactor<EditV2> {
     if (squash && this.past.length) this.past.pop();
     this.past.push(commit);
     this.future = [];
-    this.#subscribers.forEach((subscriber) => subscriber(commit));
+    this.#subscribers.forEach(subscriber => subscriber(commit));
     return commit;
   }
 
@@ -52,10 +52,11 @@ export class XMLEditor implements Transactor<EditV2> {
   subscribe(
     txCallback: TransactedCallback<EditV2>,
   ): () => TransactedCallback<EditV2> {
-    const subscriberCount = this.#subscribers.length;
     this.#subscribers.push(txCallback);
     return () => {
-      this.#subscribers.splice(subscriberCount, 1);
+      this.#subscribers = this.#subscribers.filter(
+        subscriber => subscriber !== txCallback,
+      );
       return txCallback;
     };
   }
