@@ -7,6 +7,8 @@ import {
   Transactor,
 } from '@omicronenergy/oscd-api';
 
+const EMPTY_COMMIT: Commit<EditV2> = { undo: [], redo: [] };
+
 export class XMLEditor implements Transactor<EditV2> {
   past: Commit<EditV2>[] = [];
   future: Commit<EditV2>[] = [];
@@ -36,6 +38,8 @@ export class XMLEditor implements Transactor<EditV2> {
     if (!commit) return;
     handleEdit(commit.undo);
     this.future.unshift(commit);
+    const previousCommit = this.past[this.past.length - 1] || EMPTY_COMMIT;
+    this.#subscribers.forEach(subscriber => subscriber(previousCommit));
     return commit;
   }
 
@@ -44,6 +48,7 @@ export class XMLEditor implements Transactor<EditV2> {
     if (!commit) return;
     handleEdit(commit.redo);
     this.past.push(commit);
+    this.#subscribers.forEach(subscriber => subscriber(commit));
     return commit;
   }
 
