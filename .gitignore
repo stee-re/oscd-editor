@@ -1,8 +1,9 @@
 node_modules
 
-dist    
-
+dist
 coverage
+# ignore typedoc output path
+doc
 
 .tsbuildinfo
 
