@@ -24,7 +24,7 @@
     "test": "npm run build && wtr --coverage",
     "test:watch": "npm run build && concurrently -k -r \"tsc -b --watch --preserveWatchOutput\" \"wtr --watch --coverage\"",
     "build": "npx rimraf dist && tsc",
-    "doc": "npx rimraf doc && typedoc --out doc oscd-editor.ts",
+    "doc": "npx rimraf doc && typedoc --out doc src/oscd-editor.ts",
     "prepare": "husky"
   },
   "devDependencies": {
